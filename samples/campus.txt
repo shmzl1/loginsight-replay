@@ -1,0 +1,5 @@
+2026-05-12T08:00:00Z R-17 campus INFO 收到选课请求
+2026-05-12T08:00:01Z R-18 campus INFO 收到选课请求
+2026-05-12T08:00:02Z R-17 campus INFO 调用名额服务
+2026-05-12T08:00:03Z R-18 campus INFO 选课成功
+2026-05-12T08:00:05Z R-17 campus ERROR 名额服务调用失败

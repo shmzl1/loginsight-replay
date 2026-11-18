@@ -1,0 +1,2 @@
+{"timestamp":"2026-05-12T08:00:03Z","requestId":"R-17","service":"quota","level":"INFO","message":"等待数据库连接"}
+{"timestamp":"2026-05-12T08:00:04Z","requestId":"R-17","service":"quota","level":"ERROR","message":"获取连接超时"}
