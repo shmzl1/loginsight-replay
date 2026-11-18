@@ -13,9 +13,9 @@
 
 **模块边界。** A 维护 `api/`、`org.loginsight.core.ParserRegistry` 和后续的 `org.loginsight.core.input` 输入调度包。B 在 `org.loginsight.core.text` 实现文本解析，在 `org.loginsight.core.replay` 消费统一记录、关联请求并计算统计结果。A、B 的测试分别放在对应包。C 在 `plugins/jsonl/` 仅使用公开 API 和自身 JSON 依赖，把 JSONL 映射为统一记录。D 在 `app/` 调用 B 的分析结果展示页面。
 
-**开工顺序。** 先看[系统设计初稿](docs/DESIGN.docx)、[基础文本样例](samples/campus.txt)和[JSONL 样例](samples/quota.jsonl)。B 先审 [A 的契约 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5)，C 可先核对字段，D 可先梳理交互。契约合并后，B、C、D 各自从更新后的 `main` 创建功能分支。
+**开工顺序。** 先看[系统设计初稿](docs/DESIGN.docx)、[基础文本样例](samples/campus.txt)和[JSONL 样例](samples/quota.jsonl)。B 本人负责审查和合并 [A 的契约 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5)，C 可先核对字段，D 可先梳理交互。契约合并后，B、C、D 各自从更新后的 `main` 创建功能分支。
 
-**协作与留痕。** 每人使用本人账号，为自己的实质代码或测试修改开 PR，关联任务 Issue。交叉审查安排为 **B 审 A、D 审 B、A 审 C、C 审 D**。审查人记录具体意见，作者修改或说明依据，审查人复核后再由组长或获授权维护者合并。每人至少实际审查一次他人的修改，能解释一条完整运行流程及一项他人接口。实际贡献、审查及处理结果填写在下方“成员贡献与 AI 核验”表。
+**协作与留痕。** 每人使用本人账号，至少完成一项实质代码或测试修改，为该修改开 PR 并关联任务 Issue。交叉审查安排为 **B 审 A、D 审 B、A 审 C、C 审 D**。审查人在 PR 中记录具体意见，作者提交修改或有依据的回应，并记录处理结果。有新提交时由审查人复核，确认后可直接合并，无需组长再次批准。每人至少实际审查一次他人的修改，能解释一条完整运行流程及一项他人接口。实际贡献、审查及处理结果填写在下方“成员贡献与 AI 核验”表。
 
 课程允许 2—4 人。本组四人聚焦一个核心场景、一种 SPI 机制和一个独立扩展，四个 Issue 对应本组分工。
 
@@ -39,6 +39,32 @@ main 初始基线提供四个模块、样例和 CI 配置。此阶段业务测�
 | 两份日志 | 2 | campus:1 → campus:3 → quota:1 → quota:2 → campus:5 |
 
 两次都应筛出一个失败请求 R-17。R-18 只含 campus 第 2、4 行。选中“获取连接超时”应显示 quota.jsonl 第 2 行完整原文。上方错误分布、中央时间线与右侧深色原文面板都由导入数据驱动。
+
+### B 与 D 的回放数据接口
+
+B 提供下列三组查询结果，D 将它们用于图表、请求选择和原文面板。双方可分别用同一份预期结果写分析断言和页面测试，联调时由页面读取真实结果。
+
+| 查询输入 | 返回字段 | 字段含义 |
+| --- | --- | --- |
+| 当前已导入的日志 | `errorBuckets[]` 中每项含 `minuteStart`、`errorCount` | UTC 分钟起点（ISO 8601）与该分钟 ERROR 事件数（整数）。 |
+| 选中的 `minuteStart` | `failedRequestIds[]` | 该分钟出现 ERROR 的请求标识，字符串去重；无匹配时为空数组。 |
+| 选中的 `requestId` | `timeline[]` | 该请求跨分钟、跨来源的全部事件。每项包含五个解析字段及宿主提供的 `sourceId`（本次导入的来源标识）、`sourceFile`（显示名）、`lineNumber`（从 1 开始的物理行号）、`rawLine`（去掉换行符的原文）。时间升序，同一时刻按导入次序、行号排序。 |
+
+**联调样例。** 依次导入上方两份文件，选择 08:00 UTC 和 R-17。以下为三次查询的预期输出，示例用文件名作来源标识。同名文件分别导入时，宿主须分配不同的 `sourceId`。
+
+```json
+{
+  "errorBuckets": [{"minuteStart": "2026-05-12T08:00:00Z", "errorCount": 2}],
+  "failedRequestIds": ["R-17"],
+  "timeline": [
+    {"timestamp": "2026-05-12T08:00:00Z", "requestId": "R-17", "service": "campus", "level": "INFO", "message": "收到选课请求", "sourceId": "campus.txt", "sourceFile": "campus.txt", "lineNumber": 1, "rawLine": "2026-05-12T08:00:00Z R-17 campus INFO 收到选课请求"},
+    {"timestamp": "2026-05-12T08:00:02Z", "requestId": "R-17", "service": "campus", "level": "INFO", "message": "调用名额服务", "sourceId": "campus.txt", "sourceFile": "campus.txt", "lineNumber": 3, "rawLine": "2026-05-12T08:00:02Z R-17 campus INFO 调用名额服务"},
+    {"timestamp": "2026-05-12T08:00:03Z", "requestId": "R-17", "service": "quota", "level": "INFO", "message": "等待数据库连接", "sourceId": "quota.jsonl", "sourceFile": "quota.jsonl", "lineNumber": 1, "rawLine": "{\"timestamp\":\"2026-05-12T08:00:03Z\",\"requestId\":\"R-17\",\"service\":\"quota\",\"level\":\"INFO\",\"message\":\"等待数据库连接\"}"},
+    {"timestamp": "2026-05-12T08:00:04Z", "requestId": "R-17", "service": "quota", "level": "ERROR", "message": "获取连接超时", "sourceId": "quota.jsonl", "sourceFile": "quota.jsonl", "lineNumber": 2, "rawLine": "{\"timestamp\":\"2026-05-12T08:00:04Z\",\"requestId\":\"R-17\",\"service\":\"quota\",\"level\":\"ERROR\",\"message\":\"获取连接超时\"}"},
+    {"timestamp": "2026-05-12T08:00:05Z", "requestId": "R-17", "service": "campus", "level": "ERROR", "message": "名额服务调用失败", "sourceId": "campus.txt", "sourceFile": "campus.txt", "lineNumber": 5, "rawLine": "2026-05-12T08:00:05Z R-17 campus ERROR 名额服务调用失败"}
+  ]
+}
+```
 
 ## 独立插件接入计划
 
