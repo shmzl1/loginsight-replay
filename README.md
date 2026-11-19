@@ -29,6 +29,8 @@ mvn -B -ntp clean verify
 
 main 初始基线提供四个模块、样例和 CI 配置。此阶段业务测试数为 0，尚无可启动页面。契约分支已在 JDK 17 通过 5 项 JUnit 测试，Checkstyle 为 0 违规。测试覆盖服务发现与输出、格式缺失、重名、坏行和空白请求标识。工作流在推送 main 和面向 main 的 PR 上执行同一命令，包含编译、JUnit 和针对生产、测试代码的 Checkstyle。[工作流运行](https://github.com/shmzl1/loginsight-replay/actions/workflows/verify.yml)
 
+本地回放台的启动命令、插件启停与端到端测试见 [app 使用说明](app/README.md)。
+
 ## 样例与人工核对
 
 先导入 [campus.txt](samples/campus.txt)，再启用插件并导入 [quota.jsonl](samples/quota.jsonl)。两份文件都是虚构的 UTF-8 数据。文本每行前四个空格分隔字段依次为时间、请求、服务和级别，剩余内容为消息。JSONL 每行一个对象，字段见设计初稿。
@@ -79,8 +81,8 @@ B 提供下列三组查询结果，D 将它们用于图表、请求选择和原�
 | --- | --- | --- | --- |
 | A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 建议，将测试提供者仅注册在 test 资源中。JDK 17 实测 5 项测试通过，生产 JAR 未包含测试提供者。临时副本改错重名检查后 1 项失败，恢复后全部通过。 |
 | B | 待本人填写 | 待实际审查 | 待本人填写 |
-| C | 待本人填写 | 待实际审查 | 待本人填写 |
-| D | 待本人填写 | 待实际审查 | 待本人填写 |
+| C | 分支 `feat/jsonl-plugin`；新增 `plugins/jsonl` 的 `JsonlLogParser`（格式标识 `jsonl`）、SPI 登记与 10 项测试；Commit/PR 待推送后补充。 | 待实际审查（交叉审查：A 审 C） | 采用 AI 协助实现 JSONL 解析与测试骨架；解析库选用 `org.json`（无传递依赖），API 保持 provided。JDK 17 + Maven 3.9 实测 `clean verify` 通过：core 5 项、jsonl 10 项测试全绿，Checkstyle 0 违规；真实插件 JAR 经 ServiceLoader 发现成功。临时去掉级别大写化后对应用例报错，恢复后复跑通过。 |
+| D · 林宸宇（学号见课程提交材料） | 提交本地 Web 回放、发行启动器与端到端测试，覆盖文本和 JSONL 导入、错误分布、请求时间线和原文定位。[提交 0ea99cf](https://github.com/shmzl1/loginsight-replay/commit/0ea99cf) · [PR #8](https://github.com/shmzl1/loginsight-replay/pull/8) | 委托审查 [B 的 PR #6](https://github.com/shmzl1/loginsight-replay/pull/6)，核对请求去重和同时间戳排序，[审查通过](https://github.com/shmzl1/loginsight-replay/pull/6#pullrequestreview-5975655677)。 | 复用 B 的回放分析接口，使用可选插件 JAR 启停 JSONL。Maven 26 项单元测试、2 项 HTTP 端到端测试通过，Edge 核对了文本第 5 行和 JSONL 第 2 行的完整原文。在 B 的临时副本反转同时间戳事件的行号排序，预期断言失败 1 项，恢复后 core 16 项测试通过。 |
 
 使用 AI 的成员记录一条建议、采用与否、验证方法及结论；实际未使用者填“未使用”。最终在临时副本改错一处解析器选择或事件排序，确认断言失败，恢复后通过。
 
