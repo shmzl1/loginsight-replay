@@ -79,7 +79,7 @@ B 提供下列三组查询结果，D 将它们用于图表、请求选择和原�
 | --- | --- | --- | --- |
 | A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 建议，将测试提供者仅注册在 test 资源中。JDK 17 实测 5 项测试通过，生产 JAR 未包含测试提供者。临时副本改错重名检查后 1 项失败，恢复后全部通过。 |
 | B | 待本人填写 | 待实际审查 | 待本人填写 |
-| C | 分支 `feat/jsonl-plugin`；Commit `5fe8254`；[JSONL 独立解析插件 PR #7](https://github.com/shmzl1/loginsight-replay/pull/7)（关联 Issue #3）。新增 `JsonlLogParser`（格式标识 `jsonl`）、SPI 登记与 10 项测试。 | 待实际审查（交叉审查：A 审 C） | 采用 AI 协助实现 JSONL 解析与测试骨架；解析库选用 `org.json`（无传递依赖），API 保持 provided。JDK 17 + Maven 3.9 实测 `clean verify` 通过：core 5 项、jsonl 10 项测试全绿，Checkstyle 0 违规；真实插件 JAR 经 ServiceLoader 发现成功。临时去掉级别大写化后对应用例报错，恢复后复跑通过。 |
+| C | 分支 `feat/jsonl-plugin`；提交 `5fe8254`（插件实现）、`0774def`（留痕回填）；[JSONL 独立解析插件 PR #7](https://github.com/shmzl1/loginsight-replay/pull/7)（关联 Issue #3）。新增 `JsonlLogParser`（格式标识 `jsonl`）、SPI 登记与 10 项测试。 | 待实际审查（交叉审查：A 审 C） | 采用 AI 协助实现 JSONL 解析与测试骨架；解析库选用 `org.json`（无传递依赖），API 保持 provided。JDK 17 + Maven 3.9 实测 `clean verify` 通过：core 5 项、jsonl 10 项测试全绿，Checkstyle 0 违规；真实插件 JAR 经 ServiceLoader 发现成功。临时去掉级别大写化后对应用例报错，恢复后复跑通过。 |
 | D | 待本人填写 | 待实际审查 | 待本人填写 |
 
 使用 AI 的成员记录一条建议、采用与否、验证方法及结论；实际未使用者填“未使用”。最终在临时副本改错一处解析器选择或事件排序，确认断言失败，恢复后通过。
