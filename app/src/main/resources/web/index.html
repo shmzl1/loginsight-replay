@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LogInsight 应用故障回放台</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><strong>LogInsight</strong><h1>应用故障回放台</h1></header>
+  <main>
+    <form id="upload" class="panel">
+      <label>日志文件<input id="file" type="file" accept=".txt,.log,.jsonl" required></label>
+      <label>解析格式<select id="format"><option value="text">基础文本</option><option value="jsonl">JSONL 插件</option></select></label>
+      <button type="submit">导入日志</button>
+      <p id="status" role="status"></p>
+    </form>
+    <section class="panel">
+      <h2>错误时间分布 <small>UTC · 每分钟 ERROR 数</small></h2>
+      <div id="buckets" class="buckets">导入日志后显示错误分布</div>
+    </section>
+    <div class="replay">
+      <section class="panel">
+        <h2>请求时间线</h2>
+        <label>失败请求 <select id="requests" disabled><option value="">请先选择错误时段</option></select></label>
+        <ol id="timeline"></ol>
+      </section>
+      <section class="panel raw">
+        <h2>原始日志</h2>
+        <p id="source">选择时间线事件查看来源</p>
+        <pre id="raw"></pre>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

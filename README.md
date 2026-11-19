@@ -29,6 +29,8 @@ mvn -B -ntp clean verify
 
 main 初始基线提供四个模块、样例和 CI 配置。此阶段业务测试数为 0，尚无可启动页面。契约分支已在 JDK 17 通过 5 项 JUnit 测试，Checkstyle 为 0 违规。测试覆盖服务发现与输出、格式缺失、重名、坏行和空白请求标识。工作流在推送 main 和面向 main 的 PR 上执行同一命令，包含编译、JUnit 和针对生产、测试代码的 Checkstyle。[工作流运行](https://github.com/shmzl1/loginsight-replay/actions/workflows/verify.yml)
 
+本地回放台的启动命令、插件启停与端到端测试见 [app 使用说明](app/README.md)。
+
 ## 样例与人工核对
 
 先导入 [campus.txt](samples/campus.txt)，再启用插件并导入 [quota.jsonl](samples/quota.jsonl)。两份文件都是虚构的 UTF-8 数据。文本每行前四个空格分隔字段依次为时间、请求、服务和级别，剩余内容为消息。JSONL 每行一个对象，字段见设计初稿。
