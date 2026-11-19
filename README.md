@@ -27,7 +27,7 @@
 mvn -B -ntp clean verify
 ```
 
-main 初始基线提供四个模块、样例和 CI 配置。此阶段业务测试数为 0，尚无可启动页面。首条功能 PR 提供公开契约的测试。工作流在推送 main 和面向 main 的 PR 上执行同一命令，包含编译、JUnit 和针对生产、测试代码的 Checkstyle。[工作流运行](https://github.com/shmzl1/loginsight-replay/actions/workflows/verify.yml)
+main 初始基线提供四个模块、样例和 CI 配置。此阶段业务测试数为 0，尚无可启动页面。契约分支已在 JDK 17 通过 5 项 JUnit 测试，Checkstyle 为 0 违规。测试覆盖服务发现与输出、格式缺失、重名、坏行和空白请求标识。工作流在推送 main 和面向 main 的 PR 上执行同一命令，包含编译、JUnit 和针对生产、测试代码的 Checkstyle。[工作流运行](https://github.com/shmzl1/loginsight-replay/actions/workflows/verify.yml)
 
 ## 样例与人工核对
 
@@ -77,7 +77,7 @@ B 提供下列三组查询结果，D 将它们用于图表、请求选择和原�
 
 | 姓名/学号（本人补充） | 本人改动及 Commit/PR | 审查他人的改动及结果 | 关键决策与 AI 核验 |
 | --- | --- | --- | --- |
-| A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 辅助设计的 SPI 测试方案，验证结论随 PR 登记 |
+| A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 建议，将测试提供者仅注册在 test 资源中。JDK 17 实测 5 项测试通过，生产 JAR 未包含测试提供者。临时副本改错重名检查后 1 项失败，恢复后全部通过。 |
 | B | 待本人填写 | 待实际审查 | 待本人填写 |
 | C | 待本人填写 | 待实际审查 | 待本人填写 |
 | D | 待本人填写 | 待实际审查 | 待本人填写 |

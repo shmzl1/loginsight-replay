@@ -1,0 +1,3 @@
+org.loginsight.core.ParserRegistryTest$FixtureParser
+org.loginsight.core.ParserRegistryTest$DuplicateOne
+org.loginsight.core.ParserRegistryTest$DuplicateTwo
