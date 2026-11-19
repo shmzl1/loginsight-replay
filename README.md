@@ -82,7 +82,7 @@ B 提供下列三组查询结果，D 将它们用于图表、请求选择和原�
 | A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 建议，将测试提供者仅注册在 test 资源中。JDK 17 实测 5 项测试通过，生产 JAR 未包含测试提供者。临时副本改错重名检查后 1 项失败，恢复后全部通过。 |
 | B | 待本人填写 | 待实际审查 | 待本人填写 |
 | C | 分支 `feat/jsonl-plugin`；新增 `plugins/jsonl` 的 `JsonlLogParser`（格式标识 `jsonl`）、SPI 登记与 10 项测试；Commit/PR 待推送后补充。 | 待实际审查（交叉审查：A 审 C） | 采用 AI 协助实现 JSONL 解析与测试骨架；解析库选用 `org.json`（无传递依赖），API 保持 provided。JDK 17 + Maven 3.9 实测 `clean verify` 通过：core 5 项、jsonl 10 项测试全绿，Checkstyle 0 违规；真实插件 JAR 经 ServiceLoader 发现成功。临时去掉级别大写化后对应用例报错，恢复后复跑通过。 |
-| D | 待本人填写 | 待实际审查 | 待本人填写 |
+| D · 林宸宇（学号见课程提交材料） | 提交本地 Web 回放、发行启动器与端到端测试，覆盖文本和 JSONL 导入、错误分布、请求时间线和原文定位。[提交 0ea99cf](https://github.com/shmzl1/loginsight-replay/commit/0ea99cf) · [PR #8](https://github.com/shmzl1/loginsight-replay/pull/8) | 委托 AI 辅助审查 [B 的 PR #6](https://github.com/shmzl1/loginsight-replay/pull/6)，核对请求去重和同时间戳排序，[审查通过](https://github.com/shmzl1/loginsight-replay/pull/6#pullrequestreview-5975655677)。 | 采用 AI 建议，复用 B 的回放分析接口，使用可选插件 JAR 启停 JSONL。Maven 26 项单元测试、2 项 HTTP 端到端测试通过，Edge 核对了文本第 5 行和 JSONL 第 2 行的完整原文。在 B 的临时副本反转同时间戳事件的行号排序，预期断言失败 1 项，恢复后 core 16 项测试通过。 |
 
 使用 AI 的成员记录一条建议、采用与否、验证方法及结论；实际未使用者填“未使用”。最终在临时副本改错一处解析器选择或事件排序，确认断言失败，恢复后通过。
 
