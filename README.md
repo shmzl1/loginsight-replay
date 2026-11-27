@@ -78,7 +78,7 @@ B 提供下列三组查询结果，D 将它们用于图表、请求选择和原�
 | 姓名/学号（本人补充） | 本人改动及 Commit/PR | 审查他人的改动及结果 | 关键决策与 AI 核验 |
 | --- | --- | --- | --- |
 | A | 初始化；[公开契约与 SPI 发现 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5) | 待实际审查 | 采用 AI 建议，将测试提供者仅注册在 test 资源中。JDK 17 实测 5 项测试通过，生产 JAR 未包含测试提供者。临时副本改错重名检查后 1 项失败，恢复后全部通过。 |
-| B | 待本人填写 | 待实际审查 | 待本人填写 |
+| B | [基础文本解析与请求回放](https://github.com/shmzl1/loginsight-replay/tree/feat/text-replay)，提交 `ff31fef` | 审查 [A 的 PR #5](https://github.com/shmzl1/loginsight-replay/pull/5)，提出补充 `format()` 空白或 `null` 测试的意见；PR 已合并到 `main` | 采用将来源、文件、行号和原文保存在回放记录中的建议；用 16 项 Maven 测试和 `campus.txt` 行号核对，结果通过 |
 | C | 待本人填写 | 待实际审查 | 待本人填写 |
 | D | 待本人填写 | 待实际审查 | 待本人填写 |
 
