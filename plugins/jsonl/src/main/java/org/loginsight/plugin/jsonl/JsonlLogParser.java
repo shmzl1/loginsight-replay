@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.loginsight.api.LogParser;
 import org.loginsight.api.ParseException;
 import org.loginsight.api.ParsedEvent;
@@ -29,13 +30,7 @@ public final class JsonlLogParser implements LogParser {
             throw new ParseException("line is empty");
         }
 
-        JSONObject object;
-        try {
-            object = new JSONObject(line);
-        } catch (JSONException exception) {
-            throw new ParseException("malformed JSON: " + exception.getMessage(), exception);
-        }
-
+        JSONObject object = parseObject(line);
         Instant timestamp = parseTimestamp(object);
         String requestId = requireText(object, FIELD_REQUEST_ID);
         String service = requireText(object, FIELD_SERVICE);
@@ -49,6 +44,20 @@ public final class JsonlLogParser implements LogParser {
         }
     }
 
+    /** Accepts exactly one JSON object; anything left after the closing brace is a bad line. */
+    private JSONObject parseObject(String line) throws ParseException {
+        JSONTokener tokener = new JSONTokener(line);
+        try {
+            JSONObject object = new JSONObject(tokener);
+            if (tokener.nextClean() != 0) {
+                throw new ParseException("trailing content after JSON object");
+            }
+            return object;
+        } catch (JSONException exception) {
+            throw new ParseException("malformed JSON: " + exception.getMessage(), exception);
+        }
+    }
+
     private Instant parseTimestamp(JSONObject object) throws ParseException {
         String raw = requireText(object, FIELD_TIMESTAMP);
         try {
@@ -58,14 +67,18 @@ public final class JsonlLogParser implements LogParser {
         }
     }
 
+    /** Requires a present, non-null, non-blank string; reports any other type by field name. */
     private String requireText(JSONObject object, String field) throws ParseException {
         if (!object.has(field) || object.isNull(field)) {
             throw new ParseException("missing field: " + field);
         }
-        String value = object.getString(field);
-        if (value.isBlank()) {
+        Object value = object.get(field);
+        if (!(value instanceof String text)) {
+            throw new ParseException("field is not a string: " + field);
+        }
+        if (text.isBlank()) {
             throw new ParseException("field is blank: " + field);
         }
-        return value;
+        return text;
     }
 }
