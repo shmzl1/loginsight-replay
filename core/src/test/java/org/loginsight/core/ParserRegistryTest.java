@@ -1,7 +1,15 @@
 package org.loginsight.core;
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.loginsight.api.LogParser;
 import org.loginsight.api.ParseException;
 import org.loginsight.api.ParsedEvent;
@@ -34,6 +42,31 @@ public class ParserRegistryTest {
     }
 
     public static class DuplicateTwo extends DuplicateOne {
+    }
+
+    public static class NullFormat extends FixtureParser {
+        @Override
+        public String format() {
+            return null;
+        }
+    }
+
+    public static class BlankFormat extends FixtureParser {
+        @Override
+        public String format() {
+            return " \t ";
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {NullFormat.class, BlankFormat.class})
+    void rejectsMissingFormatDuringDiscovery(Class<?> provider, @TempDir Path root) throws IOException {
+        Path services = Files.createDirectories(root.resolve("META-INF/services"));
+        Files.writeString(services.resolve(LogParser.class.getName()), provider.getName());
+        try (var loader = new URLClassLoader(new URL[] {root.toUri().toURL()}, getClass().getClassLoader())) {
+            var error = assertThrows(IllegalStateException.class, () -> new ParserRegistry(loader));
+            assertEquals("Missing format on " + provider.getName(), error.getMessage());
+        }
     }
 
     @Test
